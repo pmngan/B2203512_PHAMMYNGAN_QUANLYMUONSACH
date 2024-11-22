@@ -1,0 +1,553 @@
+<template>
+  <div class="dashboard-container flex h-screen bg-gray-100">
+    <!-- Left Column: Administrative Tools -->
+    <div class="w-1/4 bg-gray-900 text-white p-6 space-y-6">
+      <h1 class="text-xl font-bold text-center">Admin Panel</h1>
+
+      <!-- Navigation -->
+      <nav class="space-y-4">
+        <!-- Publisher Dropdown -->
+        <div class="relative">
+          <button class="w-full bg-blue-600 py-2 px-4 rounded-md text-white hover:bg-blue-700"
+            @click="toggleDropdown('publisher')">
+            <i class="fas fa-cogs mr-2"></i> PUBLISHER
+          </button>
+          <div v-show="publisherDropdownOpen" class="absolute left-0 mt-2 bg-gray-800 rounded-md w-full z-10">
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'create'">
+              <i class="fas fa-plus-circle mr-2"></i> Add Publisher
+            </button>
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'manage'">
+              <i class="fas fa-edit mr-2"></i> Manage Publishers
+            </button>
+          </div>
+        </div>
+
+        <!-- Book Dropdown -->
+        <div class="relative">
+          <button class="w-full bg-blue-600 py-2 px-4 rounded-md text-white hover:bg-blue-700"
+            @click="toggleDropdown('book')">
+            <i class="fas fa-book mr-2"></i> Book
+          </button>
+          <div v-show="bookDropdownOpen" class="absolute left-0 mt-2 bg-gray-800 rounded-md w-full z-10">
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'create'">
+              <i class="fas fa-plus-circle mr-2"></i> Add Book
+            </button>
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'manageBooks'">
+              <i class="fas fa-edit mr-2"></i> Manage Books
+            </button>
+          </div>
+        </div>
+
+        <!-- User Dropdown -->
+        <div class="relative">
+          <button class="w-full bg-blue-600 py-2 px-4 rounded-md text-white hover:bg-blue-700"
+            @click="toggleDropdown('user')">
+            <i class="fas fa-users mr-2"></i> User
+          </button>
+          <div v-show="userDropdownOpen" class="absolute left-0 mt-2 bg-gray-800 rounded-md w-full z-10">
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'create'">
+              <i class="fas fa-plus-circle mr-2"></i> Add User
+            </button>
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'manage'">
+              <i class="fas fa-edit mr-2"></i> Manage Users
+            </button>
+          </div>
+        </div>
+
+        <!-- Staff Dropdown -->
+        <div class="relative">
+          <button class="w-full bg-blue-600 py-2 px-4 rounded-md text-white hover:bg-blue-700"
+            @click="toggleDropdown('staff')">
+            <i class="fas fa-user-tie mr-2"></i> Staff
+          </button>
+          <div v-show="staffDropdownOpen" class="absolute left-0 mt-2 bg-gray-800 rounded-md w-full z-10">
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'create'">
+              <i class="fas fa-plus-circle mr-2"></i> Add Staff
+            </button>
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'manage'">
+              <i class="fas fa-edit mr-2"></i> Manage Staff
+            </button>
+          </div>
+        </div>
+
+        <!-- Borrow Tracking Dropdown -->
+        <div class="relative">
+          <button class="w-full bg-blue-600 py-2 px-4 rounded-md text-white hover:bg-blue-700"
+            @click="toggleDropdown('borrowTracking')">
+            <i class="fas fa-tracking mr-2"></i> Borrow Tracking
+          </button>
+          <div v-show="borrowTrackingDropdownOpen" class="absolute left-0 mt-2 bg-gray-800 rounded-md w-full z-10">
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'create'">
+              <i class="fas fa-plus-circle mr-2"></i> Add Borrow Tracking
+            </button>
+            <button class="w-full py-2 px-4 text-white hover:bg-blue-700" @click="currentTab = 'manage'">
+              <i class="fas fa-edit mr-2"></i> Manage Borrow Tracking
+            </button>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+
+
+
+    <!-- Right Column: Content Area -->
+    <div class="w-3/4 p-6 flex flex-col">
+      <!-- Dynamic Content -->
+
+      <!-- Add New Publisher Section -->
+      <div v-if="currentTab === 'create'" class="card bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Add New Publisher</h2>
+        <form @submit.prevent="createPublisher">
+          <div class="mb-4">
+            <label class="block font-medium text-gray-600 mb-2">Publisher Name</label>
+            <input v-model="newPublisher.tenNXB" type="text" class="w-full border-gray-300 rounded-md p-2"
+              placeholder="Enter publisher name" />
+          </div>
+          <div class="mb-4">
+            <label class="block font-medium text-gray-600 mb-2">Publisher Address</label>
+            <input v-model="newPublisher.diaChi" type="text" class="w-full border-gray-300 rounded-md p-2"
+              placeholder="Enter publisher address" />
+          </div>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            Add Publisher
+          </button>
+        </form>
+      </div>
+
+      <!-- Manage Publishers Section -->
+      <div v-if="currentTab === 'manage'" class="card bg-white p-6 rounded-lg shadow-lg flex-1 relative">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Manage Publishers</h2>
+        <!-- Search Bar -->
+        <div class="mb-4">
+          <input v-model="searchQuery" type="text" placeholder="Search by Publisher Name"
+            class="w-full p-2 border border-gray-300 rounded-md" />
+        </div>
+        <!-- Refresh Button -->
+        <button class="absolute top-4 right-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+          @click="fetchPublishers">
+          Refresh
+        </button>
+        <div v-if="filteredPublishers.length > 0" class="overflow-auto h-[calc(100vh-11.5rem)] space-y-4">
+          <div v-for="publisher in filteredPublishers" :key="publisher._id" class="border rounded-md p-4">
+            <p><strong>{{ publisher.tenNXB }}</strong></p>
+            <!-- View Details Button for each publisher -->
+            <button class="text-blue-500 hover:underline mt-2" @click="viewPublisher(publisher._id)">
+              View Details
+            </button>
+          </div>
+        </div>
+        <p v-else class="text-gray-500">No publishers found.</p>
+      </div>
+
+
+
+
+
+      <!-- Manage Books Section -->
+      <div v-if="currentTab === 'manageBooks'" class="card bg-white p-6 rounded-lg shadow-lg flex-1 relative">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Manage Books</h2>
+        <!-- Search Bar -->
+        <div class="mb-4">
+          <input v-model="searchBookQuery" type="text" placeholder="Search by Book Title"
+            class="w-full p-2 border border-gray-300 rounded-md" />
+        </div>
+        <!-- Refresh Button -->
+        <button class="absolute top-4 right-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+          @click="fetchBooks">
+          Refresh
+        </button>
+        <!-- Book List -->
+        <div v-if="filteredBooks.length > 0" class="overflow-auto h-[calc(100vh-11.5rem)] space-y-4">
+          <div v-for="book in filteredBooks" :key="book._id" class="border rounded-md p-4">
+            <p><strong>{{ book.tenSach }}</strong></p>
+            <p><small>Publisher: {{ book.maNXB?.tenNXB || 'N/A' }}</small></p>
+            <p><small>Author: {{ book.tacGia }}</small></p>
+            <!-- View Details Button -->
+            <button class="text-blue-500 hover:underline mt-2" @click="viewBook(book._id)">
+              View Details
+            </button>
+          </div>
+        </div>
+        <p v-else class="text-gray-500">No books found.</p>
+      </div>
+
+
+      <!-- Publisher Details Section (accessed through Manage Publishers) -->
+      <div v-if="currentTab === 'details'" class="card bg-white p-6 rounded-lg shadow-lg relative">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Publisher Details</h2>
+
+        <div v-if="currentPublisher" class="space-y-4">
+          <!-- Editable Fields when editing -->
+          <div v-if="isEditing">
+            <div class="mb-4">
+              <label class="font-medium text-gray-600">Publisher Name</label>
+              <input v-model="currentPublisher.tenNXB" type="text" class="w-full border-gray-300 rounded-md p-2" />
+            </div>
+            <div class="mb-4">
+              <label class="font-medium text-gray-600">Publisher Address</label>
+              <input v-model="currentPublisher.diaChi" type="text" class="w-full border-gray-300 rounded-md p-2" />
+            </div>
+
+            <!-- Save and Cancel buttons -->
+            <div class="flex space-x-4">
+              <button @click="savePublisher"
+                class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">Save</button>
+              <button @click="cancelEdit"
+                class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">Cancel</button>
+            </div>
+          </div>
+          <!-- Display Publisher Details when not editing -->
+          <div v-else>
+            <p><strong>Name:</strong> {{ currentPublisher.tenNXB }}</p>
+            <p><strong>Address:</strong> {{ currentPublisher.diaChi }}</p>
+          </div>
+        </div>
+        <p v-else class="text-gray-500">No publisher selected.</p>
+        <!-- Edit and Delete buttons -->
+        <div class="absolute bottom-4 right-4 space-x-4">
+          <!-- Edit Button -->
+          <button v-if="currentPublisher && !isEditing"
+            class="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600"
+            @click="editPublisher(currentPublisher._id)">
+            Edit
+          </button>
+          <!-- Delete Button -->
+          <button v-if="currentPublisher" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700"
+            @click="deletePublisher(currentPublisher._id)">
+            Delete
+          </button>
+        </div>
+      </div>
+
+
+
+      <div v-if="currentTab === 'bookDetails'" class="card bg-white p-6 rounded-lg shadow-lg relative">
+        <h2 class="text-2xl font-bold text-gray-700 mb-4">Book Details</h2>
+
+        <div v-if="currentBook" class="space-y-4">
+          <!-- Editable Fields when editing -->
+          <div v-if="isEditingBook">
+            <div class="mb-4">
+              <label class="font-medium text-gray-600">Title</label>
+              <input v-model="currentBook.tenSach" type="text" class="w-full border-gray-300 rounded-md p-2" />
+            </div>
+            <div class="mb-4">
+              <label class="font-medium text-gray-600">Author</label>
+              <input v-model="currentBook.tacGia" type="text" class="w-full border-gray-300 rounded-md p-2" />
+            </div>
+            <div class="mb-4">
+              <label class="font-medium text-gray-600">Publisher</label>
+              <input v-model="currentBook.maNXB?.tenNXB" type="text" class="w-full border-gray-300 rounded-md p-2" />
+            </div>
+            <div class="mb-4">
+              <label class="font-medium text-gray-600">Year Published</label>
+              <input v-model="currentBook.namXuatBan" type="number" class="w-full border-gray-300 rounded-md p-2" />
+            </div>
+
+
+            <!-- Save and Cancel buttons -->
+            <div class="flex space-x-4">
+              <button @click="saveBook"
+                class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">Save</button>
+              <button @click="cancelEditBook"
+                class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700">Cancel</button>
+            </div>
+          </div>
+          <!-- Display Publisher Details when not editing -->
+          <div v-else>
+            <p><strong>Title:</strong> {{ currentBook.tenSach }}</p>
+            <p><strong>Author:</strong> {{ currentBook.tacGia }}</p>
+            <p><strong>Publisher:</strong> {{ currentBook.maNXB?.tenNXB || "N/A" }}</p>
+            <p><strong>Year Published:</strong> {{ currentBook.namXuatBan || "N/A" }}</p>
+          </div>
+        </div>
+        <p v-else class="text-gray-500">No book selected.</p>
+
+        <!-- Edit and Delete buttons -->
+        <div class="absolute bottom-4 right-4 space-x-4">
+          <!-- Edit Button -->
+          <button v-if="currentBook && !isEditingBook"
+            class="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600"
+            @click="editBook(currentBook._id)">
+            Edit
+          </button>
+          <!-- Delete Button -->
+          <button v-if="currentBook" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700"
+            @click="deletePublisher(currentBook._id)">
+            Delete
+          </button>
+        </div>
+      </div>
+
+
+
+
+
+
+    </div>
+  </div>
+</template>
+
+
+<script>
+import BookService from "@/services/BookService";
+import PublisherService from "@/services/PublisherService";
+import { nextTick } from "vue";
+
+export default {
+  name: "PublisherDashboard",
+  data() {
+    return {
+      // currentTab: "details", // Tracks the current tab (details, create, manage)
+
+      //array
+      publishers: [],
+      books: [],
+
+      //set path
+      currentPublisher: null,
+      currentBook: null,
+
+
+      newPublisher: { tenNXB: "", diaChi: "" },
+
+
+      searchBookQuery: "",
+      searchQuery: "",
+
+
+      isEditing: false,
+      isEditingBook: false, // Tracks whether the publisher is being edited
+      publisherDropdownOpen: false,
+      bookDropdownOpen: false,
+      userDropdownOpen: false,
+      staffDropdownOpen: false,
+      borrowTrackingDropdownOpen: false,
+      currentTab: null,
+    };
+  },
+
+  computed: {
+    // Filter the publishers list based on search query
+    filteredPublishers() {
+      return this.publishers.filter(publisher => {
+        return publisher.tenNXB.toLowerCase().includes(this.searchQuery.toLowerCase());
+      });
+    },
+
+    filteredBooks() {
+      return this.books.filter((book) =>
+        book.tenSach.toLowerCase().includes(this.searchBookQuery.toLowerCase())
+      );
+    },
+  },
+
+
+
+  methods: {
+    toggleDropdown(type) {
+      // Close the selected dropdown if it was already open
+      if (this[type + 'DropdownOpen']) {
+        this[type + 'DropdownOpen'] = false;
+      } else {
+        // Close all dropdowns and open the selected one
+        this.publisherDropdownOpen = false;
+        this.bookDropdownOpen = false;
+        this.userDropdownOpen = false;
+        this.staffDropdownOpen = false;
+        this.borrowTrackingDropdownOpen = false;
+        this[type + 'DropdownOpen'] = true;
+      }
+    },
+
+
+////fetch data
+    async fetchPublishers() {
+      try {
+        const response = await PublisherService.findAll();
+        this.publishers = response.data;
+        console.log("Publishers fetched:", this.publishers);
+      } catch (error) {
+        console.error("Error fetching publishers:", error);
+      }
+    },
+    async fetchBooks() {
+      try {
+        const response = await BookService.findAll();
+        this.books = response.data;
+        console.log("Books fetched:", this.books); // Ensure data is being received
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      }
+    },
+
+
+
+////view 
+    async viewPublisher(publisherId) {
+      try {
+        const publisher = await PublisherService.findOne(publisherId);
+        this.currentPublisher = publisher;
+        this.currentTab = "details"; // Switch to details tab
+      } catch (error) {
+        console.error("Error viewing publisher:", error);
+      }
+    },
+    
+    async viewBook(bookId) {
+      try {
+        const book = await BookService.findOne(bookId); // Fetch book details
+        this.currentBook = book; // Set the current book
+        this.currentTab = "bookDetails"; // Switch to book details tab
+      } catch (error) {
+        console.error("Error viewing book:", error);
+      }
+    },
+
+
+
+///create
+    async createPublisher() {
+      try {
+        const response = await PublisherService.createPublisher(this.newPublisher);
+        console.log("Publisher Response:", response.data); // Log the new publisher's response
+
+        if (response.data && response.data._id) {
+          // After creating, refetch publishers to update the list
+          await this.fetchPublishers();
+        }
+
+        this.newPublisher = { tenNXB: "", diaChi: "" }; // Reset form
+        nextTick(() => {
+          this.currentTab = "manage"; // Switch to manage tab after adding a publisher
+        });
+      } catch (error) {
+        console.error("Error creating publisher:", error);
+      }
+    },
+
+///edit
+    async editPublisher(publisherId) {
+      try {
+        const publisher = await PublisherService.findOne(publisherId);
+        this.currentPublisher = { ...publisher }; // Create a copy to ensure we're editing the correct data
+        this.isEditing = true; // Enable the editing mode
+      } catch (error) {
+        console.error("Error fetching publisher for editing:", error);
+      }
+    },
+    async editBook(bookId) {
+      try {
+        const book = await BookService.findOne(bookId);
+        this.currentBook = { ...book }; // Copy the book details for editing
+        this.isEditingBook = true; // Enable editing mode
+      } catch (error) {
+        console.error("Error fetching book for editing:", error);
+      }
+    },
+
+
+
+
+
+///save
+    async savePublisher() {
+      try {
+        const updatedPublisher = await PublisherService.update(this.currentPublisher._id, this.currentPublisher);
+        console.log("Publisher updated:", updatedPublisher);
+        this.isEditing = false; // Disable editing mode
+        this.fetchPublishers(); // Refresh the publishers list
+        this.currentTab = "manage"; // Switch back to the manage tab
+      } catch (error) {
+        console.error("Error updating publisher:", error);
+      }
+    },
+    async saveBook() {
+      try {
+        const updatedBook = await BookService.updateBook(this.currentBook._id, this.currentBook);
+        console.log("Book updated:", updatedBook);
+        this.isEditingBook = false; // Disable editing mode
+        this.fetchBooks(); // Refresh the publishers list
+        this.currentTab = "manageBooks"; // Switch back to the manage tab
+      } catch (error) {
+        console.error("Error updating books:", error);
+      }
+    },
+
+    
+
+
+
+
+
+
+
+///cancel
+    cancelEdit() {
+      this.isEditing = false; // Disable editing mode
+      this.fetchPublishers();
+    },
+    cancelEditBook() {
+      this.isEditingBook = false; // Disable editing mode
+      this.fetchBooks(); // Fetch the original publisher details again
+    },
+    
+
+
+////delete
+    async deletePublisher(publisherId) {
+      try {
+        const confirmDelete = confirm("Are you sure you want to delete this publisher?");
+        if (confirmDelete) {
+          await PublisherService.delete(publisherId);
+          console.log("Publisher deleted:", publisherId);
+          this.fetchPublishers();
+          this.currentPublisher = null;
+          this.currentTab = "manage";
+        }
+      } catch (error) {
+        console.error("Error deleting publisher:", error);
+      }
+    },
+    async deleteBook(bookId) {
+      try {
+        const confirmDelete = confirm("Are you sure you want to delete this book?");
+        if (confirmDelete) {
+          await BookService.delete(bookId);
+          console.log("Book deleted:", bookId);
+          this.fetchBooks(); // Refresh the book list
+          this.currentBook = null; // Clear current book
+          this.currentTab = "manageBooks"; // Switch back to the manage tab
+        }
+      } catch (error) {
+        console.error("Error deleting book:", error);
+      }
+    },
+  },
+
+
+
+
+  created() {
+    this.fetchPublishers(); // Fetch the publishers when the component is created
+    this.fetchBooks();
+  },
+};
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////
+staffdashboard
